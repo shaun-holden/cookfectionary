@@ -1,13 +1,10 @@
 import twilio from "twilio";
 
-const client = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
-const FROM = process.env.TWILIO_PHONE_NUMBER!;
-
 export async function sendSMS(to: string, body: string) {
-  if (!process.env.TWILIO_ACCOUNT_SID || process.env.TWILIO_ACCOUNT_SID.startsWith("AC_")) return;
+  const sid = process.env.TWILIO_ACCOUNT_SID;
+  if (!sid || !sid.startsWith("AC")) return;
+  const client = twilio(sid, process.env.TWILIO_AUTH_TOKEN);
+  const FROM = process.env.TWILIO_PHONE_NUMBER!;
   try {
     await client.messages.create({ from: FROM, to, body });
   } catch (err) {

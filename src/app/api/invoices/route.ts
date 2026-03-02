@@ -25,18 +25,15 @@ export async function POST(req: NextRequest) {
   const order = await prisma.order.findUnique({ where: { id: orderId }, include: { user: true } });
   if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
-  // Create Stripe Payment Link
+  // Create Stripe Price then Payment Link
+  const price = await stripe.prices.create({
+    currency: "usd",
+    unit_amount: Math.round(amount * 100),
+    product_data: { name: `Cookfectionary Invoice #${orderId.slice(-8).toUpperCase()}` },
+  });
+
   const paymentLink = await stripe.paymentLinks.create({
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          product_data: { name: `Cookfectionary Invoice #${orderId.slice(-8).toUpperCase()}` },
-          unit_amount: Math.round(amount * 100),
-        },
-        quantity: 1,
-      },
-    ],
+    line_items: [{ price: price.id, quantity: 1 }],
     metadata: { orderId },
   });
 

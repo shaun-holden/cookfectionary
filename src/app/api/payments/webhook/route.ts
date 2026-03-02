@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  if (event.type === "payment_link.completed" || event.type === "checkout.session.completed") {
+  if (event.type === "checkout.session.completed") {
     const session = event.data.object as { metadata?: { orderId?: string } };
     const orderId = session.metadata?.orderId;
     if (orderId) {
