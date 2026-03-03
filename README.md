@@ -1,371 +1,451 @@
+<div align="center">
+
 # Cookfectionary
 
-> **Where Every Bite Tells a Story** — A full-stack catering website and web app.
+### Where Every Bite Tells a Story
 
-**Live:** https://cookfectionary-app-production.up.railway.app
-**GitHub:** https://github.com/shaun-holden/cookfectionary
+A full-stack catering platform — public website, customer portal, real-time messaging, Stripe payments, and an admin dashboard to run the entire business.
+
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)](https://postgresql.org/)
+[![Stripe](https://img.shields.io/badge/Stripe-008CDD?logo=stripe&logoColor=white)](https://stripe.com/)
+[![Railway](https://img.shields.io/badge/Railway-0B0D0E?logo=railway&logoColor=white)](https://railway.app/)
+
+[Live Demo](https://cookfectionary-app-production.up.railway.app) · [Report Bug](https://github.com/shaun-holden/cookfectionary/issues) · [Request Feature](https://github.com/shaun-holden/cookfectionary/issues)
+
+</div>
 
 ---
 
-## Overview
+## Table of Contents
 
-Cookfectionary is a complete catering business platform with a public-facing marketing website, customer ordering portal, real-time messaging, Stripe payments, and an admin dashboard to manage everything.
+- [About](#about)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Database Schema](#database-schema)
+- [API Reference](#api-reference)
+- [WebSocket Events](#websocket-events)
+- [Deployment](#deployment)
+- [Project Structure](#project-structure)
+
+---
+
+## About
+
+Cookfectionary is a production-ready catering business platform built with Next.js 15 and React 19. It combines a polished public-facing website with a full customer ordering portal and an admin dashboard — all backed by real-time messaging, Stripe payments, Cloudinary image hosting, and email/SMS notifications.
+
+---
+
+## Screenshots
+
+> Add screenshots to a `docs/screenshots/` folder and uncomment the sections below.
+
+<!--
+### Home Page
+![Home Page](docs/screenshots/home.png)
+
+### Menu
+![Menu](docs/screenshots/menu.png)
+
+### Customer Dashboard
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Admin Panel
+![Admin](docs/screenshots/admin.png)
+-->
 
 ---
 
 ## Features
 
 ### Public Website
-| Page | Description |
-|---|---|
-| **Home** | Hero section, featured menu preview, why-us section, testimonials, CTA |
-| **About** | Caterer story, values, stats |
-| **Menu** | Full menu filtered by category (Mains, Sides, Desserts, Drinks). Click + to add to cart |
-| **Gallery** | Masonry photo grid with lightbox. Click any photo to view full size |
-| **Contact** | Inquiry form, business info, hours |
 
-### Customer Account
-Customers register/log in to access:
+- **Home** — Hero section, featured dishes, testimonials, and call-to-action
+- **Menu** — Browse all items filtered by category (Mains, Sides, Desserts, Drinks)
+- **Gallery** — Masonry photo grid with full-size lightbox
+- **About** — The caterer's story, values, and stats
+- **Contact** — Inquiry form with business info and hours
 
-- **Place Orders** — Browse the menu, add items to cart, enter event details (date, type, guest count, notes), submit order
-- **View Orders** — Track all orders and their status (Pending → Confirmed → In Progress → Completed)
-- **Pay Invoices** — When admin sends an invoice, a Stripe payment link appears. Click "Pay Now" to pay online
-- **Messages** — Real-time chat with the caterer. Replies appear instantly without refreshing
+### Customer Portal
 
-### Admin Dashboard (`/admin`)
-Admin logs in to manage the entire business:
+- **Place Orders** — Add items to cart, enter event details (date, type, guest count), submit
+- **Track Orders** — Follow status from Pending → Confirmed → In Progress → Completed
+- **Pay Invoices** — Click a Stripe payment link to pay online
+- **Live Chat** — Real-time messaging with the caterer via Socket.IO
 
-#### Orders
-- View all incoming orders with full customer details
-- One-click status updates: Pending → Confirmed → In Progress → Completed → Cancelled
-- See event date, type, guest count, special notes per order
+### Admin Dashboard
 
-#### Menu Management
-- Add, edit, or delete menu items
-- Upload photos directly (stored on Cloudinary)
-- Set name, description, price, category, and availability
-
-#### Gallery
-- Upload event/food photos (stored on Cloudinary)
-- Attach a title, description, and category to each photo
-- Delete photos — automatically removes from Cloudinary too
-
-#### Invoices
-- Create invoices for any confirmed order
-- Set invoice amount, optional deposit, and due date
-- Railway auto-generates a Stripe Payment Link and emails it to the customer
-- Track invoice status: Pending / Sent / Paid / Overdue
-
-#### Customers
-- View all registered customers with contact info and order count
-
-#### Messages
-- See all customer conversations in one inbox
-- Reply in real-time — customer sees your message instantly
+| Section | Capabilities |
+|---------|-------------|
+| **Orders** | View all orders, update status, see event details and special notes |
+| **Menu** | Add, edit, or delete items with photo uploads via Cloudinary |
+| **Gallery** | Upload and manage event photos (auto-syncs with Cloudinary) |
+| **Invoices** | Create invoices, generate Stripe payment links, track payment status |
+| **Customers** | View all registered customers with contact info and order history |
+| **Messages** | Unified inbox with real-time replies across all conversations |
 
 ### Notifications
-Every key action triggers automatic notifications:
 
-| Event | Email | SMS |
-|---|---|---|
-| Order placed | ✅ Customer gets confirmation | ✅ Customer gets SMS |
-| Invoice sent | ✅ Customer gets invoice + payment link | ✅ Customer gets SMS |
-| New message | ✅ Recipient gets email preview | — |
+| Trigger | Email | SMS |
+|---------|:-----:|:---:|
+| Order placed | ✅ | ✅ |
+| Invoice sent | ✅ | ✅ |
+| New message | ✅ | — |
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 15 (App Router) |
-| Styling | Tailwind CSS v3 + Framer Motion |
-| Database | PostgreSQL + Prisma ORM |
-| Auth | JWT (ADMIN / CUSTOMER roles) |
-| Payments | Stripe Checkout + Payment Links + Webhooks |
-| Images | Cloudinary (signed uploads) |
-| Real-time | Socket.IO |
-| Email | Nodemailer |
-| SMS | Twilio |
-| Server | Custom Node.js server (`server.js`) |
-| Deploy | Railway |
+| Category | Technology |
+|----------|-----------|
+| **Framework** | [Next.js 15](https://nextjs.org/) (App Router) + [React 19](https://react.dev/) |
+| **Language** | [TypeScript 5](https://typescriptlang.org/) |
+| **Styling** | [Tailwind CSS 3](https://tailwindcss.com/) + [Framer Motion](https://motion.dev/) |
+| **Database** | [PostgreSQL](https://postgresql.org/) + [Prisma ORM](https://prisma.io/) |
+| **Auth** | JWT with role-based access (Admin / Customer) |
+| **Payments** | [Stripe](https://stripe.com/) — Checkout, Payment Links, Webhooks |
+| **Images** | [Cloudinary](https://cloudinary.com/) (signed uploads) |
+| **Real-time** | [Socket.IO](https://socket.io/) |
+| **Email** | [Nodemailer](https://nodemailer.com/) |
+| **SMS** | [Twilio](https://twilio.com/) |
+| **Server** | Custom Node.js server (`server.js`) wrapping Next.js + Socket.IO |
+| **Hosting** | [Railway](https://railway.app/) |
 
 ---
 
-## Local Development
+## Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- PostgreSQL (local or Railway)
-- Accounts for: Stripe, Cloudinary, Twilio, Gmail (or SMTP provider)
 
-### Setup
+- **Node.js** 18+
+- **PostgreSQL** (local instance or hosted)
+- Accounts: [Stripe](https://dashboard.stripe.com/register), [Cloudinary](https://cloudinary.com/), [Twilio](https://twilio.com/), Gmail (or any SMTP provider)
+
+### Installation
 
 ```bash
-# 1. Clone the repo
+# Clone
 git clone https://github.com/shaun-holden/cookfectionary.git
 cd cookfectionary
 
-# 2. Install dependencies
+# Install dependencies
 npm install
 
-# 3. Copy env file and fill in your keys
+# Set up environment variables
 cp .env.local.example .env.local
-# Edit .env.local with your actual API keys
+# Edit .env.local with your actual keys (see section below)
 
-# 4. Push the database schema
+# Push the database schema
 npx prisma db push
 
-# 5. Seed the database (creates admin account + sample data)
+# Seed with sample data
 npm run db:seed
 
-# 6. Start the development server
+# Start the dev server
 npm run dev
 ```
 
-Open http://localhost:3000
+Open [http://localhost:3000](http://localhost:3000)
 
 ### Seed Accounts
 
 | Role | Email | Password |
-|---|---|---|
-| Admin | admin@cookfectionary.com | admin123 |
-| Customer | customer@cookfectionary.com | customer123 |
+|------|-------|----------|
+| Admin | `admin@cookfectionary.com` | `admin123` |
+| Customer | `customer@cookfectionary.com` | `customer123` |
 
 ---
 
 ## Environment Variables
 
-Create a `.env.local` file in the root:
+Create `.env.local` in the project root:
 
 ```env
-# Database
+# ── Database ──────────────────────────────────────────────
 DATABASE_URL="postgresql://user:password@localhost:5432/cookfectionary"
 
-# Auth
+# ── Auth ──────────────────────────────────────────────────
 JWT_SECRET="your-random-secret-string"
 JWT_EXPIRES_IN="7d"
 
-# Stripe (get from dashboard.stripe.com → Developers → API Keys)
+# ── Stripe ────────────────────────────────────────────────
 STRIPE_SECRET_KEY="sk_test_..."
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
 STRIPE_WEBHOOK_SECRET="whsec_..."
 
-# Cloudinary (get from cloudinary.com → Dashboard)
+# ── Cloudinary ────────────────────────────────────────────
 CLOUDINARY_CLOUD_NAME="your_cloud_name"
 CLOUDINARY_API_KEY="your_api_key"
 CLOUDINARY_API_SECRET="your_api_secret"
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your_cloud_name"
 
-# Twilio (get from console.twilio.com)
+# ── Twilio ────────────────────────────────────────────────
 TWILIO_ACCOUNT_SID="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 TWILIO_AUTH_TOKEN="your_auth_token"
 TWILIO_PHONE_NUMBER="+1xxxxxxxxxx"
 
-# Email / SMTP (Gmail: Settings → Security → App Passwords)
+# ── Email (SMTP) ─────────────────────────────────────────
 SMTP_HOST="smtp.gmail.com"
 SMTP_PORT="587"
 SMTP_USER="your@gmail.com"
 SMTP_PASS="your_app_password"
 SMTP_FROM="Cookfectionary <your@gmail.com>"
 
-# App URL
+# ── App ───────────────────────────────────────────────────
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
-
----
-
-## API Routes
-
-### Auth
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/auth/register` | Create customer account |
-| POST | `/api/auth/login` | Login (returns JWT) |
-| GET | `/api/auth/me` | Get current user |
-
-### Menu
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/menu` | Public | List all available items |
-| POST | `/api/menu` | Admin | Create menu item |
-| PATCH | `/api/menu/[id]` | Admin | Update menu item |
-| DELETE | `/api/menu/[id]` | Admin | Delete menu item |
-
-### Gallery
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/gallery` | Public | List all gallery images |
-| POST | `/api/gallery` | Admin | Add gallery image |
-| DELETE | `/api/gallery/[id]` | Admin | Remove image (also deletes from Cloudinary) |
-
-### Orders
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/orders` | User | List orders (admin sees all, customer sees own) |
-| POST | `/api/orders` | User | Place new order |
-| GET | `/api/orders/[id]` | User | Get order detail |
-| PATCH | `/api/orders/[id]` | Admin | Update order status |
-
-### Invoices
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/invoices` | User | List invoices |
-| POST | `/api/invoices` | Admin | Create invoice + Stripe Payment Link |
-
-### Messages
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/messages` | User | Get conversation(s). Admin gets all, customer gets their own |
-| POST | `/api/messages` | User | Send a message |
-
-### Payments
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/api/payments/checkout` | User | Create Stripe Checkout session |
-| POST | `/api/payments/webhook` | Stripe | Handle payment events (marks invoices/orders as paid) |
-
-### Upload
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/api/upload/sign` | Admin | Generate Cloudinary upload signature |
-
----
-
-## Socket.IO Events
-
-| Event | Direction | Description |
-|---|---|---|
-| `join-admin` | Client → Server | Admin joins the `admin-room` to receive all events |
-| `join-user` | Client → Server | Customer joins their `user:{id}` room |
-| `join-conversation` | Client → Server | Join a specific conversation room |
-| `send-message` | Client → Server | Send a chat message |
-| `new-message` | Server → Client | Broadcast new message to conversation participants |
-| `new-order` | Server → Client | Notify admin room of a new order |
-
----
-
-## Deployment (Railway)
-
-### First-time setup
-```bash
-# 1. Create Railway project
-railway init --name cookfectionary
-
-# 2. Add PostgreSQL
-railway add --database postgres
-
-# 3. Add app service and link
-railway add --service cookfectionary-app
-railway service link cookfectionary-app
-
-# 4. Set environment variables
-railway variables set NODE_ENV=production \
-  JWT_SECRET="your-secret" \
-  JWT_EXPIRES_IN=7d \
-  'DATABASE_URL=${{Postgres.DATABASE_URL}}' \
-  STRIPE_SECRET_KEY="sk_live_..." \
-  # ... etc
-
-# 5. Deploy
-railway up --detach
-
-# 6. Generate domain
-railway domain
-
-# 7. Run seed
-railway run npm run db:seed
-```
-
-### Ongoing deploys
-```bash
-git add . && git commit -m "your message" && git push && railway up --detach
-```
-
-### Stripe Webhook (production)
-After deploying, go to [dashboard.stripe.com/webhooks](https://dashboard.stripe.com/webhooks):
-1. Add endpoint: `https://cookfectionary-app-production.up.railway.app/api/payments/webhook`
-2. Select events: `checkout.session.completed`, `payment_link.completed`
-3. Copy the signing secret → set `STRIPE_WEBHOOK_SECRET` on Railway
 
 ---
 
 ## Database Schema
 
 ```
-User         — id, email, password, name, phone, role (ADMIN/CUSTOMER)
-MenuItem     — id, name, description, price, category, image, available
-Order        — id, userId, total, status, eventDate, eventType, guestCount, paymentStatus
-OrderItem    — id, orderId, menuItemId, quantity, price, notes
-Invoice      — id, orderId, amount, deposit, status, stripeUrl, dueDate, paidAt
-GalleryImage — id, title, description, imageUrl, category
-Conversation — id, customerId
-Message      — id, conversationId, senderId, content, read
-Notification — id, userId, type, title, message, read
+User
+├── id, email, password, name, phone
+├── role (ADMIN | CUSTOMER)
+├── orders[], conversations[], notifications[]
+
+MenuItem
+├── id, name, description, price, category
+├── image (Cloudinary URL), available (boolean)
+
+Order
+├── id, userId → User
+├── total, status, paymentStatus
+├── eventDate, eventType, guestCount, notes
+├── items[] → OrderItem, invoice → Invoice
+
+OrderItem
+├── id, orderId → Order, menuItemId → MenuItem
+├── quantity, price, notes
+
+Invoice
+├── id, orderId → Order
+├── amount, deposit, status, stripeUrl, dueDate, paidAt
+
+GalleryImage
+├── id, title, description, imageUrl, category
+
+Conversation
+├── id, customerId → User, messages[] → Message
+
+Message
+├── id, conversationId → Conversation, senderId → User
+├── content, read (boolean)
+
+Notification
+├── id, userId → User, type, title, message, read
 ```
+
+**Order status flow:** `PENDING` → `CONFIRMED` → `IN_PROGRESS` → `COMPLETED` | `CANCELLED`
+
+**Payment status flow:** `UNPAID` → `PARTIAL` → `PAID` | `REFUNDED`
+
+---
+
+## API Reference
+
+### Auth
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/auth/register` | Create a customer account |
+| `POST` | `/api/auth/login` | Authenticate and receive a JWT |
+| `GET` | `/api/auth/me` | Get the current user from token |
+
+### Menu
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/menu` | Public | List all available items |
+| `POST` | `/api/menu` | Admin | Create a menu item |
+| `PATCH` | `/api/menu/[id]` | Admin | Update a menu item |
+| `DELETE` | `/api/menu/[id]` | Admin | Delete a menu item |
+
+### Gallery
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/gallery` | Public | List all gallery images |
+| `POST` | `/api/gallery` | Admin | Add a gallery image |
+| `DELETE` | `/api/gallery/[id]` | Admin | Delete image (removes from Cloudinary) |
+
+### Orders
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/orders` | User | List orders (admin: all, customer: own) |
+| `POST` | `/api/orders` | User | Place a new order |
+| `GET` | `/api/orders/[id]` | User | Get order details |
+| `PATCH` | `/api/orders/[id]` | Admin | Update order status |
+
+### Invoices
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/invoices` | User | List invoices |
+| `POST` | `/api/invoices` | Admin | Create invoice + Stripe payment link |
+
+### Messages
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/messages` | User | Get conversations (admin: all, customer: own) |
+| `POST` | `/api/messages` | User | Send a message |
+
+### Payments
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `POST` | `/api/payments/checkout` | User | Create a Stripe Checkout session |
+| `POST` | `/api/payments/webhook` | Stripe | Handle payment events |
+
+### Upload
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `POST` | `/api/upload/sign` | Admin | Generate a Cloudinary upload signature |
+
+---
+
+## WebSocket Events
+
+The app uses a custom Node.js server (`server.js`) that wraps Next.js with Socket.IO for real-time features.
+
+| Event | Direction | Description |
+|-------|-----------|-------------|
+| `join-admin` | Client → Server | Admin joins `admin-room` to receive all events |
+| `join-user` | Client → Server | Customer joins their `user:{id}` room |
+| `join-conversation` | Client → Server | Join a specific conversation room |
+| `send-message` | Client → Server | Send a chat message |
+| `new-message` | Server → Client | Broadcast message to conversation participants |
+| `new-order` | Server → Client | Notify admin of a new order |
+
+---
+
+## Deployment
+
+### Railway (Recommended)
+
+#### First-Time Setup
+
+```bash
+# Create project and add services
+railway init --name cookfectionary
+railway add --database postgres
+railway add --service cookfectionary-app
+railway service link cookfectionary-app
+
+# Set environment variables
+railway variables set \
+  NODE_ENV=production \
+  JWT_SECRET="your-secret" \
+  JWT_EXPIRES_IN=7d \
+  'DATABASE_URL=${{Postgres.DATABASE_URL}}' \
+  STRIPE_SECRET_KEY="sk_live_..." \
+  # ... (all other env vars)
+
+# Deploy
+railway up --detach
+
+# Generate public URL
+railway domain
+
+# Seed the database
+railway run npm run db:seed
+```
+
+#### Ongoing Deploys
+
+```bash
+git add . && git commit -m "your message" && git push
+railway up --detach
+```
+
+> The `postinstall` script automatically runs `prisma generate` and `prisma db push` on every deploy.
+
+#### Stripe Webhook (Production)
+
+1. Go to [Stripe Webhooks](https://dashboard.stripe.com/webhooks)
+2. Add endpoint: `https://your-domain.up.railway.app/api/payments/webhook`
+3. Select events: `checkout.session.completed`
+4. Copy the signing secret → set `STRIPE_WEBHOOK_SECRET` on Railway
+
+### Testing Stripe Payments
+
+| Card Number | Result |
+|-------------|--------|
+| `4242 4242 4242 4242` | Payment succeeds |
+| `4000 0000 0000 9995` | Payment declined |
+
+Use any future expiry date and any 3-digit CVC.
 
 ---
 
 ## Project Structure
 
 ```
-Cookfectionary/
-├── server.js                    # Custom server (Next.js + Socket.IO)
+cookfectionary/
+├── server.js                       # Custom server (Next.js + Socket.IO)
 ├── prisma/
-│   ├── schema.prisma            # Database schema
-│   └── seed.ts                  # Seed script (admin + sample data)
+│   ├── schema.prisma               # Database schema
+│   └── seed.ts                     # Seed script
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx             # Home page
-│   │   ├── about/               # About page
-│   │   ├── menu/                # Menu page
-│   │   ├── gallery/             # Gallery page
-│   │   ├── contact/             # Contact page
-│   │   ├── order/               # Order builder
-│   │   ├── login/ register/     # Auth pages
-│   │   ├── dashboard/           # Customer portal
+│   │   ├── page.tsx                # Home
+│   │   ├── about/                  # About page
+│   │   ├── menu/                   # Menu page
+│   │   ├── gallery/                # Gallery page
+│   │   ├── contact/                # Contact page
+│   │   ├── order/                  # Order builder
+│   │   ├── login/                  # Login page
+│   │   ├── register/               # Registration page
+│   │   ├── dashboard/              # Customer portal
 │   │   │   ├── orders/
 │   │   │   ├── invoices/
 │   │   │   └── messages/
-│   │   ├── admin/               # Admin panel
+│   │   ├── admin/                  # Admin panel
 │   │   │   ├── orders/
 │   │   │   ├── menu/
 │   │   │   ├── gallery/
 │   │   │   ├── invoices/
 │   │   │   ├── customers/
 │   │   │   └── messages/
-│   │   └── api/                 # All API routes
+│   │   └── api/                    # REST API routes
 │   ├── components/
-│   │   ├── layout/              # Navbar, Footer
-│   │   ├── home/                # Home page sections
-│   │   └── ui/                  # Shared UI components
+│   │   ├── layout/                 # Navbar, Footer, PublicLayout
+│   │   ├── home/                   # Home page sections
+│   │   └── ui/                     # Shared UI components
 │   ├── context/
-│   │   ├── AuthContext.tsx      # Auth state
-│   │   ├── CartContext.tsx      # Shopping cart
-│   │   └── SocketContext.tsx    # Socket.IO connection
+│   │   ├── AuthContext.tsx          # Auth state + JWT
+│   │   ├── CartContext.tsx          # Shopping cart state
+│   │   └── SocketContext.tsx        # Socket.IO connection
 │   ├── lib/
-│   │   ├── prisma.ts            # Prisma client
-│   │   ├── auth.ts              # JWT helpers
-│   │   ├── stripe.ts            # Stripe client
-│   │   ├── cloudinary.ts        # Cloudinary + upload signing
-│   │   ├── email.ts             # Nodemailer templates
-│   │   └── sms.ts               # Twilio helpers
-│   └── types/index.ts           # Shared TypeScript types
+│   │   ├── prisma.ts               # Prisma client singleton
+│   │   ├── auth.ts                 # JWT helpers + middleware
+│   │   ├── stripe.ts               # Stripe client
+│   │   ├── cloudinary.ts           # Cloudinary config + signing
+│   │   ├── email.ts                # Nodemailer templates
+│   │   ├── sms.ts                  # Twilio helpers
+│   │   └── socket.ts               # Socket.IO client
+│   └── types/
+│       └── index.ts                # Shared TypeScript interfaces
+├── package.json
+├── next.config.ts
+├── tailwind.config.ts
+└── tsconfig.json
 ```
 
 ---
 
-## Testing Stripe Payments (Development)
+<div align="center">
 
-Use Stripe test cards:
+Built with ❤️ for Cookfectionary
 
-| Card Number | Result |
-|---|---|
-| `4242 4242 4242 4242` | Payment succeeds |
-| `4000 0000 0000 9995` | Payment declined |
-
-Any future expiry date and any 3-digit CVC work.
-
----
-
-Built with ❤️ for Cookfectionary.
+</div>
