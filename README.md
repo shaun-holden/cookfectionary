@@ -33,6 +33,7 @@ A full-stack catering platform — public website, customer portal, real-time me
 - [WebSocket Events](#websocket-events)
 - [Deployment](#deployment)
 - [Project Structure](#project-structure)
+- [Admin Guide](docs/ADMIN_GUIDE.md)
 
 ---
 
