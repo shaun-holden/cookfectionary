@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth, getUserFromRequest } from "@/lib/auth";
+import { getUserFromRequest } from "@/lib/auth";
 import { sendOrderConfirmationEmail } from "@/lib/email";
-import { sendOrderConfirmationSMS } from "@/lib/sms";
 
 export async function GET(req: NextRequest) {
   const payload = getUserFromRequest(req);
@@ -52,7 +51,10 @@ export async function POST(req: NextRequest) {
   // Notify
   try {
     await sendOrderConfirmationEmail(order.user.email, order.user.name, order.id, order.total);
-    if (order.user.phone) await sendOrderConfirmationSMS(order.user.phone, order.id);
+    if (order.user.phone) {
+      const { sendOrderConfirmationSMS } = await import("@/lib/sms");
+      await sendOrderConfirmationSMS(order.user.phone, order.id);
+    }
   } catch (err) {
     console.error("Notification error:", err);
   }

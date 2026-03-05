@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth, getUserFromRequest } from "@/lib/auth";
 import { stripe } from "@/lib/stripe";
 import { sendInvoiceEmail } from "@/lib/email";
-import { sendInvoiceSMS } from "@/lib/sms";
 
 export async function GET(req: NextRequest) {
   const payload = getUserFromRequest(req);
@@ -52,7 +51,10 @@ export async function POST(req: NextRequest) {
   // Notify customer
   try {
     await sendInvoiceEmail(order.user.email, order.user.name, invoice.id, amount, paymentLink.url);
-    if (order.user.phone) await sendInvoiceSMS(order.user.phone, amount);
+    if (order.user.phone) {
+      const { sendInvoiceSMS } = await import("@/lib/sms");
+      await sendInvoiceSMS(order.user.phone, amount);
+    }
   } catch (err) {
     console.error("Invoice notification error:", err);
   }
